@@ -50,7 +50,7 @@ export default function EditTrade() {
         "maxTotalGain": 0,
         "worstCaseAmount": 0,
         "actualGain": 0,
-        "result": ""
+        "result": "in_progress"
     })
 
     const { name,tradeDate,script,closePrice,doubleScreenDecision,candleStickPattern,volume,ema,chartPattern,fibRetracement,divergence,immediateSupport,immediateResistance,majorSupport,majorResistance,stopLoss,minTargetPrice,maxTargetPrice,minReward,maxReward,risk,minRiskRewardRatio,maxRiskRewardRatio,tradeDecision,totalCapital,investmentPerTrade,maxRiskAllowed,maxNoOfSharesAllowed,totalInvestment,noOfShares,riskInvolved,minProfitPotential,maxProfitPotential,minROI,maxROI,minTotalGain,maxTotalGain,worstCaseAmount,actualGain,result } = trade;
@@ -130,8 +130,8 @@ export default function EditTrade() {
         }else if(trade.doubleScreenDecision == 'sell'){
             risk = value_l - Number(trade.closePrice) ;
         }
-        let minRr = Number(showMinimumRewardText)/Number(risk);
-        let maxRr = Number(showMaximumRewardText)/Number(risk);
+        let minRr = Number(trade.minReward)/Number(risk);
+        let maxRr = Number(trade.maxReward)/Number(risk);
         setshowRiskText(risk)
         setshowMinrR(minRr);
         setshowMaxrR(maxRr);
@@ -147,7 +147,7 @@ export default function EditTrade() {
         setTrade({ ...trade, [e.target.name]: Number(e.target.value) })
     }
     const calculateNoOfSharesAllowed=(e) => {
-        let maxAllowedShares_l = Number(showMaxRiskAllowed)/Number(showRiskText);
+        let maxAllowedShares_l = Number(trade.maxRiskAllowed)/Number(trade.risk);
         setshowNoOfAllowedShares(maxAllowedShares_l)  
         trade.maxNoOfSharesAllowed = maxAllowedShares_l;
         setTrade({ ...trade, [e.target.name]: Number(e.target.value) })
@@ -156,10 +156,10 @@ export default function EditTrade() {
         let l_value = Number(e.target.value);
         let noOfShares= l_value/Number(trade.closePrice);
         setshowNumberOfShares(noOfShares)
-        let riskInvolved = noOfShares*Number(showRiskText);
+        let riskInvolved = noOfShares*Number(trade.risk);
         setshowRiskInvolved(riskInvolved)
-        let minProfitPotential= noOfShares*Number(showMinimumRewardText);
-        let maxProfitPotential= noOfShares*Number(showMaximumRewardText);
+        let minProfitPotential= noOfShares*Number(trade.minReward);
+        let maxProfitPotential= noOfShares*Number(trade.maxReward);
         let minROI_l = (minProfitPotential/l_value)*100;
         let maxROI_l = (maxProfitPotential/l_value)*100;
         let minTotalGain_l = Number(minProfitPotential)+l_value;
@@ -190,7 +190,7 @@ export default function EditTrade() {
     const onSubmit=async(e)=>{
         e.preventDefault();
         await axios.put(`http://localhost:8080/smm/${id}`,trade)
-        navigate("/")
+        navigate("/trade")
     };
 
     const loadTrade = async () =>{
@@ -302,20 +302,20 @@ export default function EditTrade() {
                             <br></br>
                             <label>
                                 Divergence:
-                                <input type="checkbox" name='divergence' value={divergence} onChange={(e) => onCheckBoxChange(e)} />
+                                <input type="checkbox" name='divergence' checked={divergence} onChange={(e) => onCheckBoxChange(e)} />
                             </label>
                             {
                                 ((showHideImmediateSupport == "buy" || trade.doubleScreenDecision == "buy") &&
-                                    <div>
+                                    <div >
                                         <label>
                                             Immediate Resistance:
-                                            <input name='immediateResistance' value={immediateResistance} onChange={(e) => onMinimumTargetPrice(e)} />
+                                            <input name='immediateResistance' value={trade.immediateResistance} onChange={(e) => onMinimumTargetPrice(e)} />
                                         </label>
 
                                         <br></br>
                                         <label>
                                             Major Resistance:
-                                            <input name='majorResistance' value={majorResistance} onChange={(e) => onMaximumTargetPrice(e)} />
+                                            <input name='majorResistance' value={trade.majorResistance} onChange={(e) => onMaximumTargetPrice(e)} />
                                         </label>
                                     </div>
                                 )
@@ -325,12 +325,12 @@ export default function EditTrade() {
                                     <div>
                                         <label>
                                             Immediate Support:
-                                            <input name='immediateSupport' value={immediateSupport} onChange={(e) => onMinimumTargetPrice(e)} />
+                                            <input name='immediateSupport' value={trade.immediateSupport} onChange={(e) => onMinimumTargetPrice(e)} />
                                         </label>
                                         <br></br>
                                         <label>
                                             Major Support:
-                                            <input name='majorSupport' value={majorSupport} onChange={(e) => onMaximumTargetPrice(e)} />
+                                            <input name='majorSupport' value={trade.majorSupport} onChange={(e) => onMaximumTargetPrice(e)} />
                                         </label>
                                     </div>
                                 )
@@ -338,41 +338,41 @@ export default function EditTrade() {
                             <br></br>
                             <label>
                                 Stop Loss
-                                <input name='stopLoss' value={stopLoss} onChange={(e) => calculateRisk(e)} />
+                                <input name='stopLoss' value={trade.stopLoss} onChange={(e) => calculateRisk(e)} />
                             </label>
                             <br></br>
-                            <label name='minTargetPrice' ref={inputRef} value={showMinimumText} onChange={(e)=>onInputChange(e)}>
+                            <label  name='minTargetPrice' ref={inputRef} value={showMinimumText} onChange={(e)=>onInputChange(e)}>
                                 Minimum Target Price: 
-                                <input name='minTargetPrice' value={showMinimumText} onChange={(e)=>onInputChange(e)} defaultValue={minTargetPrice}/>
+                                <input name='minTargetPrice' value={trade.minTargetPrice} onChange={(e)=>onInputChange(e)} defaultValue={minTargetPrice}/>
                             </label>
                             <br></br>
                             <label>
                                 Maximum Target Price: 
-                                <input name='maxTargetPrice' value={showMaximumText} onChange={(e)=>onInputChange(e)} />
+                                <input name='maxTargetPrice' value={trade.maxTargetPrice} onChange={(e)=>onInputChange(e)} />
                             </label>
                             <br></br>
                             <label>
-                                Minimum Reward: {showMinimumRewardText}
+                                Minimum Reward: {trade.minReward}
                                 {/* <input name='minReward' value={name} onChange={(e)=>calculateMinReward(e)} /> */}
                             </label>
                             <br></br>
                             <label>
-                                Maximum Reward: {showMaximumRewardText}
+                                Maximum Reward: {trade.maxReward}
                                 {/* <input name='maxReward' value={name} onChange={(e) => onInputChange(e)} /> */}
                             </label>
                             <br></br>
                             <label>
-                                Risk: {showRiskText}
+                                Risk: {trade.risk}
                                 {/* <input name='risk' value={name} onChange={(e) => onInputChange(e)} /> */}
                             </label>
                             <br></br>
                             <label>
-                                Minimum r:R : {showMinrR}
+                                Minimum r:R : {trade.minRiskRewardRatio}
                                 {/* <input name='minRiskRewardRatio' value={name} onChange={(e) => onInputChange(e)} /> */}
                             </label>
                             <br></br>
                             <label>
-                                Maximum r:R : {showMaxrR}
+                                Maximum r:R : {trade.maxRiskRewardRatio}
                                 {/* <input name='maxRiskRewardRatio' value={name} onChange={(e) => onInputChange(e)} /> */}
                             </label>
                             <br></br>
@@ -388,59 +388,59 @@ export default function EditTrade() {
                             </label>
                             <br></br>
                             <label>Total Capital
-                                <input name='totalCapital' value={name} onChange={(e) => calculateAllowedRisk(e)} />
+                                <input name='totalCapital' value={trade.totalCapital} onChange={(e) => calculateAllowedRisk(e)} />
                             </label>
                             <br></br>
                             <label>Investment Per Trade
-                                <input name='investmentPerTrade' value={name} onChange={(e) => calculateNoOfSharesAllowed(e)} />
+                                <input name='investmentPerTrade' value={trade.investmentPerTrade} onChange={(e) => calculateNoOfSharesAllowed(e)} />
                             </label>
                             <br></br>
-                            <label>Max. Allowed Risk / Trade of total Capital (2%): {showMaxRiskAllowed}
+                            <label>Max. Allowed Risk / Trade of total Capital (2%): {trade.maxRiskAllowed}
                                 {/* <input name='maxRiskAllowed' value={name} onChange={(e) => calculateAllowedRisk(e)} /> */}
                             </label>
                             <br></br>
                             <label>
-                                Max no. of shared Allowed: {showNoOfAllowedShares}
+                                Max no. of shared Allowed: {trade.maxNoOfSharesAllowed}
                                 {/* <input name='maxNoOfSharesAllowed' value={name} onChange={(e) => onInputChange(e)} /> */}
                             </label>
                             <br></br>
                             <label>Total Investment
-                                <input name='totalInvestment' value={name} onChange={(e) => calculateInvestments(e)} />
+                                <input name='totalInvestment' value={trade.totalInvestment} onChange={(e) => calculateInvestments(e)} />
                             </label>
                             <br></br>
-                            <label>No of Shares: {showNumberOfShares}
+                            <label>No of Shares: {trade.noOfShares}
                                 {/* <input name='noOfShares' value={name} onChange={(e) => onInputChange(e)} /> */}
                             </label>
                             <br></br>
-                            <label>Risk Involved: {showRiskInvolved}
+                            <label>Risk Involved: {trade.riskInvolved}
                                 {/* <input name='riskInvolved' value={name} onChange={(e) => onInputChange(e)} /> */}
                             </label>
                             <br></br>
-                            <label>Min Profit Potential: {showMinProfitPotential}
+                            <label>Min Profit Potential: {trade.minProfitPotential}
                                 {/* <input name='minProfitPotential' value={name} onChange={(e) => onInputChange(e)} /> */}
                             </label>
                             <br></br>
-                            <label>Max Profit Potential: {showMaxProfitPotential}
+                            <label>Max Profit Potential: {trade.maxProfitPotential}
                                 {/* <input name='maxProfitPotential' value={name} onChange={(e) => onInputChange(e)} /> */}
                             </label>
                             <br></br>
-                            <label>Min ROI: {showMinROI}
+                            <label>Min ROI: {trade.minROI}
                                 {/* <input name='minROI' value={name} onChange={(e) => onInputChange(e)} /> */}
                             </label>
                             <br></br>
-                            <label>Max ROI: {showMaxROI}
+                            <label>Max ROI: {trade.maxROI}
                                 {/* <input name='maxROI' value={name} onChange={(e) => onInputChange(e)} /> */}
                             </label>
                             <br></br>
-                            <label>Min Total Gain: {showMinTotalGain}
+                            <label>Min Total Gain: {trade.minTotalGain}
                                 {/* <input name='minTotalGain' value={name} onChange={(e) => onInputChange(e)} /> */}
                             </label>
                             <br></br>
-                            <label>Max Total Gain: {showMaxTotalGain}
+                            <label>Max Total Gain: {trade.maxTotalGain}
                                 {/* <input name='maxTotalGain' value={name} onChange={(e) => onInputChange(e)} /> */}
                             </label>
                             <br></br>
-                            <label>Worst Case Amount: {showWorstCaseAmount}
+                            <label>Worst Case Amount: {trade.worstCaseAmount}
                                 {/* <input name='worstCaseAmount' value={name} onChange={(e) => onInputChange(e)} /> */}
                             </label>
                             <br></br>
@@ -460,7 +460,6 @@ export default function EditTrade() {
                                 <button onClick={handleClick}>Submit</button>
                             </div>
                         </form>
-
                         <button type='submit' className='btn btn-outline-primary'>Submit  </button>
                         <Link className='btn btn-outline-danger mx-3' to='/trade' >
                             Cancel</Link>

@@ -49,7 +49,7 @@ export default function AddTrade() {
         "maxTotalGain": 0,
         "worstCaseAmount": 0,
         "actualGain": 0,
-        "result": ""
+        "result": "in_progress"
     })
 
     const { name,tradeDate,script,closePrice,doubleScreenDecision,candleStickPattern,volume,ema,chartPattern,fibRetracement,divergence,immediateSupport,immediateResistance,majorSupport,majorResistance,stopLoss,minTargetPrice,maxTargetPrice,minReward,maxReward,risk,minRiskRewardRatio,maxRiskRewardRatio,tradeDecision,totalCapital,investmentPerTrade,maxRiskAllowed,maxNoOfSharesAllowed,totalInvestment,noOfShares,riskInvolved,minProfitPotential,maxProfitPotential,minROI,maxROI,minTotalGain,maxTotalGain,worstCaseAmount,actualGain,result } = trade;
@@ -441,7 +441,7 @@ export default function AddTrade() {
                             <br></br>
                             <label>
                                 Result:
-                                <select name='result' onChange={(e) => onInputChange(e)}>
+                                <select name='result' onChange={(e) => onInputChange(e)} defaultValue="in_progress">
                                     <option value={"in_progress"}>In Progress</option>
                                     <option value={"success"}>Successful</option>
                                     <option value={"fail"}>Failed</option>
