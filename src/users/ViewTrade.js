@@ -44,7 +44,7 @@ export default function ViewTrade() {
         "maxTotalGain": 0,
         "worstCaseAmount": 0,
         "actualGain": 0,
-        "result": ""
+        "result": "in_progress"
     })
     useEffect(()=>{
         loadTrade();
@@ -101,8 +101,36 @@ export default function ViewTrade() {
                                 </li>
                                 <li className="list-group-item">
                                     <b>Divergence:</b>
-                                     {trade.divergence}
+                                     {trade.divergence+''}
                                 </li>
+                                {
+                                    ((trade.doubleScreenDecision == "buy") &&
+                                        <div>
+                                        <li className="list-group-item">
+                                            <b>Immediate Resistance:</b>
+                                            {trade.immediateResistance}
+                                        </li>
+                                        <li className="list-group-item">
+                                            <b>Major Resistance:</b>
+                                            {trade.majorResistance}
+                                        </li>
+                                        </div>
+                                ) 
+                            } 
+                            {
+                                    ((trade.doubleScreenDecision == "sell") &&
+                                        <div>
+                                        <li className="list-group-item">
+                                            <b>Immediate Support:</b>
+                                            {trade.immediateSupport}
+                                        </li>
+                                        <li className="list-group-item">
+                                            <b>Major Support:</b>
+                                            {trade.majorSupport}
+                                        </li>
+                                        </div>
+                                ) 
+                            }
                                 <li className="list-group-item">
                                     <b>Stop Loss:</b>
                                      {trade.stopLoss}
@@ -146,6 +174,14 @@ export default function ViewTrade() {
                                 <li className="list-group-item">
                                     <b>Investment Per Trade:</b>
                                      {trade.investmentPerTrade}
+                                </li>
+                                <li className="list-group-item">
+                                    <b>Max. Allowed Risk / Trade of total Capital (2%):</b>
+                                     {trade.maxRiskAllowed}
+                                </li>
+                                <li className="list-group-item">
+                                    <b>Max no. of shared Allowed:</b>
+                                     {trade.maxNoOfSharesAllowed}
                                 </li>
                                 <li className="list-group-item">
                                     <b>No of Shares :</b>
